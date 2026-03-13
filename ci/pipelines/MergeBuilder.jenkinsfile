@@ -1,0 +1,57 @@
+@Library("shared-pipeline-steps") _
+
+pipeline {
+    agent {
+        node { label 'node24' }
+    }
+    options {
+        ansiColor('xterm')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        timeout(time: 20, unit: 'MINUTES')
+    }
+    stages {
+        stage('Setup') {
+            steps {
+                sh  '''
+                        git config --global user.email "jenkins_user@example.com"
+                        git config --global user.name "Jenkins Service"
+                    '''
+
+                git url: 'project_url',
+                    branch: env.BRANCH_NAME,
+                    credentialsId: 'jenkins-user'
+
+                echo "Merge request ID: ${env.CHANGE_ID}\nChange author: ${env.CHANGE_AUTHOR}"
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh 'yarn install'
+            }
+        }
+        stage('Run Biome Lint') {
+            steps {
+                sh 'yarn biome lint .'
+            }
+        }
+        stage('Check Import Organization') {
+            steps {
+                sh 'biome lint . --rules organizeImports'
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                def message = "*✅ Pipeline Passed for ${env.BRANCH_NAME}! 🎉*\nJenkins Job: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n🔗 <${env.BUILD_URL}|View Pipeline>"
+                sendSlackNotification(message)
+            }
+        }
+        failure {
+            script {
+                def message = "*❌ Pipeline Failed for ${env.BRANCH_NAME}! 🚨*\nJenkins Job: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n🔗 <${env.BUILD_URL}|View Pipeline Report>"
+                sendSlackNotification(message)
+            }
+        }
+    }
+}

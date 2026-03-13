@@ -1,0 +1,28 @@
+{
+    "name": "ubiquiti_assignment_network",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "workspaces": [
+        "server"
+    ],
+    "scripts": {
+        "server:start": "yarn workspace test-api-server start",
+        "server:dev": "yarn workspace test-api-server dev",
+        "biome-lint": "biome lint .",
+        "biome-check-imports": "biome lint . --rules organizeImports",
+        "check-format": "biome format . --check",
+        "biome-format-apply": "biome format . --write",
+        "run-tests": "playwright test",
+        "run-tests-with-report": "playwright test && playwright show-report",
+        "show-report": "playwright show-report",
+        "clean-results": "rm -rf playwright-report/ test-results/",
+        "copy-db-file": "cp server/db.json test-results/db.json"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "2.4.6",
+        "@playwright/test": "1.58.2",
+        "@types/node": "25.3.5"
+    },
+    "packageManager": "yarn@4.13.0"
+}

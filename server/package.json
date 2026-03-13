@@ -1,0 +1,18 @@
+{
+    "name": "test-api-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "mini-server.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "module",
+    "scripts": {
+        "start": "node mini-server.js",
+        "dev": "node --watch mini-server.js"
+    },
+    "dependencies": {
+        "express": "5.2.1"
+    },
+    "packageManager": "yarn@4.13.0"
+}

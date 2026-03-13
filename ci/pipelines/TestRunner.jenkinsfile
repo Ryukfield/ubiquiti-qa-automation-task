@@ -1,0 +1,69 @@
+@Library("shared-pipeline-steps") _
+
+pipeline {
+    agent {
+        node { label 'node24' }
+    }
+    parameters {
+        string(name: 'SOURCE_BRANCH', defaultValue: 'main', description: 'Source code branch for Playwright Tests')
+        booleanParam(name: 'UPDATE_SCREENSHOTS', defaultValue: false, description: 'Update Screenshots before tests execition')
+    }
+    options {
+        skipDefaultCheckout(true)
+        ansiColor('xterm')
+        buildDiscarder(logRotator(numToKeepStr:'20'))
+        timeout(time: 3, unit: 'HOURS')
+    }
+    environment {
+        PLAYWRIGHT_REPORT_URL = "${env.BUILD_URL}/playwright-report/index.html"
+    }
+    stages {
+        stage('Setup') {
+            steps {
+                script {
+                    echo 'Setting Git global configuration.'
+                    sh  '''
+                            git config --global user.email "jenkins-user@example.com"
+                            git config --global user.name "Jenkins Service"
+                        '''
+                    echo "Pulling Playwright Project"
+                    git url: 'project_url',
+                        branch: params.SOURCE_BRANCH,
+                        credentialsId: 'jenkins-user'
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh 'yarn install'
+            }
+        }
+        stage('Update Reference Screenshots') {
+            when {
+                expression { params.UPDATE_SCREENSHOTS }
+            }
+            steps {
+                echo 'yarn update-screenshots'
+            }
+        }
+        stage('Run Playwright Tests') {
+            steps {
+                sh 'yarn run-tests --reporter=html'
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                def message = "*✅ E2E Tests Passed! 🎉*\nJenkins Job: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n🔗 <${env.BUILD_URL}|View Pipeline>"
+                sendSlackNotification(message)
+            }
+        }
+        failure {
+            script {
+                def message = "*❌ E2E Tests Failed! 🚨*\nJenkins Job: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n🔗 <${env.BUILD_URL}|View Pipeline>\n📎 <${PLAYWRIGHT_REPORT_URL}|Playwright Report>"
+                sendSlackNotification(message)
+            }
+        }
+    }
+}
