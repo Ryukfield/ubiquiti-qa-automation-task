@@ -8,7 +8,6 @@ export class HomePage extends BasePage {
         const categoryLink = this.page.locator(selector).and(this.page.locator(":visible")).first();
 
         await categoryLink.waitFor({ state: "visible" });
-
         await categoryLink.click();
     }
 }

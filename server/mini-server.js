@@ -11,7 +11,6 @@ const directoryPath = import.meta.dirname;
 const PORT = 3000;
 const DB_FILE = path.join(directoryPath, "db.json");
 
-// Helper function: READ data from file
 const readDB = () => {
     if (!fs.existsSync(DB_FILE)) {
         fs.writeFileSync(DB_FILE, JSON.stringify([initialBook], null, 2));
@@ -87,7 +86,7 @@ app.delete("/books/:id", (req, res) => {
     res.status(200).json({ message: "Book deleted" });
 });
 
-// Health check endpoint for Playwright webServer
+// Healthcheck endpoint for Playwright webServer
 app.get("/", (_req, res) => {
     res.status(200).send("API is alive");
 });
