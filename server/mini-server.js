@@ -43,7 +43,6 @@ app.get("/books/:id", (req, res) => {
 app.post("/books", (req, res) => {
     const books = readDB();
     const newBook = {
-        // Generate a new ID based on the maximum existing one
         id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
         ...req.body,
     };
