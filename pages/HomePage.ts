@@ -7,7 +7,13 @@ export class HomePage extends BasePage {
         const selector = `a[href*='/category/']:has(:text-is("${categoryName}"))`;
         const categoryLink = this.page.locator(selector).and(this.page.locator(":visible")).first();
 
-        await categoryLink.waitFor({ state: "visible" });
-        await categoryLink.click();
+        await Promise.all([
+            this.page.waitForResponse((response) => 
+                response.url().includes(`/category/`) && 
+                response.url().includes('.json') &&
+                response.status() === 200
+            ),
+            categoryLink.click()
+        ]);
     }
 }

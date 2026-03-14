@@ -27,7 +27,6 @@ export abstract class BasePage {
         */
         // if (await this.regionContinueBtn.isVisible()) {
         //    await this.regionContinueBtn.click();
-        //    await this.page.waitForTimeout(500);
         // }
 
         if (await this.acceptCookiesBtn.isVisible()) {

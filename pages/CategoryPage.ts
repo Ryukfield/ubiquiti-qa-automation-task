@@ -15,8 +15,13 @@ export class CategoryPage extends BasePage {
     async waitForProductsToLoad(): Promise<void> {
         const productList = this.getAvailableProductsLocator();
 
+        /*
+            TODO
+            Need to find proper solution for waiting for product cards to be loaded.
+            REMOVE waitForTimeout.
+        */
         await productList.first().waitFor({ state: "visible", timeout: 5000 });
-        await this.page.waitForTimeout(1500);
+        await this.page.waitForTimeout(2500);
     }
 
     async getAvailableProductsCount(): Promise<number> {
