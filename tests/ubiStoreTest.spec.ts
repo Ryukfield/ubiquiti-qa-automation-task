@@ -22,23 +22,25 @@ test.describe("Ubiquiti Store E2E Test", () => {
         await homePage.handlePopups();
 
         for (const category of categoriesToAdd) {
-            await homePage.goToCategory(category.name);
+            const categoryName = category.name;
+            const itemsPerCategory = category.count;
+
+            await homePage.goToCategory(categoryName);
 
             await categoryPage.waitForPageToLoad();
             await categoryPage.waitForProductsToLoad();
             const availableCount = await categoryPage.getAvailableProductsCount();
             if (availableCount < category.count)
-                throw new Error(`Expected at least ${category.count} available products in '${category.name}', but found only ${availableCount}.`);
+                throw new Error(`Expected at least ${category.count} available products in '${categoryName}', but found only ${availableCount}.`);
 
-            for (let i = 0; i < category.count; i++) {
+            for (let i = 0; i < itemsPerCategory; i++) {
                 await categoryPage.chooseProduct(i);
 
                 await productPage.waitForPageToLoad();
                 await productPage.clickAddToCart();
-                await page.waitForTimeout(300);
                 await productPage.waitForAddToCartButtonEnabled();
 
-                if (i < category.count - 1) {
+                if (i !== itemsPerCategory - 1) {
                     await productPage.goBack();
                     await categoryPage.waitForPageToLoad();
                     await categoryPage.waitForProductsToLoad();
